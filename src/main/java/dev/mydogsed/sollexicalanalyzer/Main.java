@@ -154,7 +154,7 @@ public class Main extends ListenerAdapter {
         CommandListUpdateAction updateAction = guild.updateCommands();
         for(String commandName : commandNames){
             updateAction = updateAction.addCommands(
-                    registry.getExecutor(commandName).getData().setGuildOnly(true)
+                    registry.getExecutor(commandName).getData()
             );
         }
         updateAction.queue();

@@ -20,6 +20,7 @@ public class QuotesUtil {
 
         // is this a text quote?
         if (quote.isTextQuote()) {
+            // TODO: sometimes quote.getContent() is more than 256 chars, and errors out.
             eb.addField(quote.getContent(), quote.getJumpURL() + "\nScore: " + quote.getScore(), false);
         }
 

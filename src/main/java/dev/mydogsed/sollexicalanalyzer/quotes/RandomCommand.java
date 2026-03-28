@@ -4,6 +4,7 @@ import dev.mydogsed.sollexicalanalyzer.framework.SlashCommand;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.QuotesDB;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.Quote;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -14,8 +15,8 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
+import net.dv8tion.jda.api.components.buttons.Button;
+import net.dv8tion.jda.api.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,6 +28,7 @@ import static dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil.randomQuoteEmbed
 
 public class RandomCommand implements SlashCommand {
 
+    // upvote and downvote emojis from Fruity Factory
     private static final Emoji up = jda.getEmojiById(1233196810793783356L);
     private static final Emoji down = jda.getEmojiById(1313221080659394660L);
 
@@ -89,10 +91,10 @@ public class RandomCommand implements SlashCommand {
         }
 
         EmbedBuilder eb = randomQuoteEmbed(randomQuote);
-        hook.editOriginalEmbeds(eb.build()).setActionRow(
+        hook.editOriginalEmbeds(eb.build()).setComponents(ActionRow.of(
                 Button.of(ButtonStyle.PRIMARY, "upvote", up),
                 Button.of(ButtonStyle.DANGER, "downvote", down)
-        ).queue(m -> handleButtonInteraction(m, event, randomQuote));
+        )).queue(m -> handleButtonInteraction(m, event, randomQuote));
 
     }
 
@@ -103,7 +105,7 @@ public class RandomCommand implements SlashCommand {
             @Override
             public void run() {
                 // Disable the actionRows
-                var ar = message.getActionRows().get(0);
+                ActionRow ar = message.getComponents().getFirst().asActionRow();
                 event.getHook().editOriginalComponents(ar.asDisabled()).queue();
             }
         };
@@ -117,7 +119,7 @@ public class RandomCommand implements SlashCommand {
         new Timer().schedule(new TimerTask() {
             public void run() {
                 // Disable the actionRows
-                var ar = message.getActionRows().get(0);
+                ActionRow ar = message.getComponents().getFirst().asActionRow();
                 event.getHook().editOriginalComponents(ar.asDisabled()).queue();
 
                 // Unregister the event listener
