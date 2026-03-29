@@ -44,11 +44,9 @@ public class Main extends ListenerAdapter {
 
     public static MessageCache smashesCache;
 
-    public static MessageCache quotesCache;
-
     private static final long startTime = System.currentTimeMillis();
 
-    public static void main(String[] args) {
+    static void main() {
         // Log the bot in
         try {
             jda = JDABuilder.createDefault(getApiKey())
@@ -79,7 +77,7 @@ public class Main extends ListenerAdapter {
     // Register all commands and things after the bot is logged in and ready for us to do so
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        logger.info("Starting sol-lexical-analyzer on JDA version " + JDAInfo.VERSION);
+        logger.info("Starting sol-lexical-analyzer on JDA version {}", JDAInfo.VERSION);
 
         // Set the bot's status to idle
         jda.getPresence().setPresence(OnlineStatus.DO_NOT_DISTURB, Activity.customStatus("starting..."), false);
@@ -87,9 +85,9 @@ public class Main extends ListenerAdapter {
         // TODO: move this to a command or something, this really should only be done once, not every time the bot logs in
         // MessageCache has to come first, before we attach command executors
 
-        createMessageCache();
+        createSmashesCache();
         registerCommandExecutors();
-        registerSlashCommands();
+        registerSlashCommandsToDiscord();
         registerListeners();
 
         // Set timer for pulling a random line as a status
@@ -111,36 +109,30 @@ public class Main extends ListenerAdapter {
         logger.info ("Startup took {} s", (System.currentTimeMillis() - startTime) / 1000);
     }
 
-    // Create the quotes and messages caches
-    private static void createMessageCache() {
-
-//        logger.info("Creating the quotes cache...");
-//        long startTime = System.currentTimeMillis();
-//        // Create the quotes cache
-//        quotesCache = new MessageCache(Objects.requireNonNull(jda.getTextChannelById(1233098767658520668L)));
-//        logger.info("quotes cache took {}s", (System.currentTimeMillis() - startTime) / 1000);
+    // Create the smashes cache
+    private static void createSmashesCache() {
 
         logger.info("Creating the smashes cache...");
         long startTime = System.currentTimeMillis();
         // Create the smashes cache
         smashesCache = new MessageCache(Objects.requireNonNull(jda.getTextChannelById(1293961375273451615L)));
-        logger.info("smashes cache took {}s", (System.currentTimeMillis() - startTime) / 1000);
+        logger.info("smashes cache took {}s", (System.currentTimeMillis() - startTime) / 1000.0d);
 
         // All caches created
         logger.info("All message caches created!");
     }
 
     // Register the slash commands to discord (does NOT register executors)
-    public static void registerSlashCommands(){
+    public static void registerSlashCommandsToDiscord(){
         // MyDogsBot guild: 734502410952769607
         // Fruity Factory: 1233092684198182943
         // GDC: 612467012018634753
 
         // Register slash commands for the two guilds:
         try {
-            registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("734502410952769607")));
-            registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("1233092684198182943")));
-            registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("612467012018634753")));
+            registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("734502410952769607"))); // MyDogsBot
+            registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("1233092684198182943"))); // Fruity Factory
+            // registerCommandsForGuild(Objects.requireNonNull(jda.getGuildById("612467012018634753"))); // GDC
         } catch (NullPointerException e) {
             logger.error("Guilds not found for registering slash commands!");
         }
@@ -161,12 +153,12 @@ public class Main extends ListenerAdapter {
     }
 
     // Register the command Executors so the commands actually do something lmao
-    public static void registerCommandExecutors(){
+    private static void registerCommandExecutors(){
 
         // Register simple slash commands
         commandRegistry.register(new SimpleSlashCommand(
                 "invite",
-                "Prints the invite link for the bot to the chanel!",
+                "Prints the invite link for the bot to the channel!",
                 "Invite the bot here: "
                         + "https://discord.com/oauth2/authorize?client_id=1294039897316917278&permissions=8&scope=bot"
         ));
@@ -187,8 +179,9 @@ public class Main extends ListenerAdapter {
         logger.info("Registered Command Executors");
     }
 
-    // Register shutdownRunnables -- registered executors will do nothing if this listener isn't registered
-    public static void registerListeners(){
+    // register all listeners across the project
+    // all listeners must be registered here
+    private static void registerListeners(){
         // Event listener for the command registry
         jda.addEventListener(new RegistrySlashCommandListener());
 
