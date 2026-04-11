@@ -1,6 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes.persist.models;
 
-import dev.mydogsed.sollexicalanalyzer.Util;
+import dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -94,22 +94,22 @@ public class Quote {
     }
 
     public void updateContent(Message message) {
-        if (Util.isTextQuote(message)) {
+        if (QuotesUtil.isTextQuote(message)) {
             this.content = message.getContentRaw();
             this.isTextQuote = true;
         }
 
-        else if (Util.isForwardedTextQuote(message)) {
+        else if (QuotesUtil.isForwardedTextQuote(message)) {
             this.content = message.getMessageSnapshots().get(0).getContentRaw();
             this.isTextQuote = true;
         }
 
-        else if (Util.isImageQuote(message)) {
+        else if (QuotesUtil.isImageQuote(message)) {
             this.imageURL = message.getAttachments().get(0).getUrl();
             this.isTextQuote = false;
         }
 
-        else if (Util.isForwardedImageQuote(message)) {
+        else if (QuotesUtil.isForwardedImageQuote(message)) {
             this.imageURL = message.getMessageSnapshots().get(0).getAttachments().get(0).getUrl();
             this.isTextQuote = false;
         }
