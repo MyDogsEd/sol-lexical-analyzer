@@ -1,5 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes;
 
+import dev.mydogsed.sollexicalanalyzer.DiscordStatics;
 import dev.mydogsed.sollexicalanalyzer.framework.SlashCommand;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.QuotesDB;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.Quote;
@@ -7,7 +8,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.components.actionrow.ActionRow;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,13 +24,11 @@ import java.awt.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static dev.mydogsed.sollexicalanalyzer.Main.jda;
 
 public class RandomCommand implements SlashCommand {
 
     // upvote and downvote emojis from Fruity Factory
-    private static final Emoji up = jda.getEmojiById(1233196810793783356L);
-    private static final Emoji down = jda.getEmojiById(1313221080659394660L);
+
 
     @Override
     public SlashCommandData getData() {
@@ -90,8 +88,8 @@ public class RandomCommand implements SlashCommand {
 
         EmbedBuilder eb = randomQuoteEmbed(randomQuote);
         hook.editOriginalEmbeds(eb.build()).setComponents(ActionRow.of(
-                Button.of(ButtonStyle.PRIMARY, "upvote", up),
-                Button.of(ButtonStyle.DANGER, "downvote", down)
+                Button.of(ButtonStyle.PRIMARY, "upvote", DiscordStatics.getInstance().getUpvoteEmoji()),
+                Button.of(ButtonStyle.DANGER, "downvote", DiscordStatics.getInstance().getDownvoteEmoji())
         )).queue(m -> addButtonsCallback(m, event, randomQuote));
 
     }
@@ -174,7 +172,7 @@ public class RandomCommand implements SlashCommand {
     private static EmbedBuilder randomQuoteEmbed(Quote quote) {
         EmbedBuilder eb = new EmbedBuilder()
                 .setTitle("Random Quote")
-                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", jda.getSelfUser().getAvatarUrl())
+                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", DiscordStatics.getInstance().getAvatarUrl())
                 .setColor(new Color(88, 133, 162))
                 .setFooter(quote.getAuthor().getUserName(), quote.getAuthor().getAvatarURL())
                 .setTimestamp(quote.getTimeCreated());

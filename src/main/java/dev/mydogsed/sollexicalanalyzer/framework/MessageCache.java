@@ -1,6 +1,5 @@
 package dev.mydogsed.sollexicalanalyzer.framework;
 
-import dev.mydogsed.sollexicalanalyzer.Main;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageHistory;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -11,7 +10,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 public class MessageCache {
@@ -38,7 +36,7 @@ public class MessageCache {
             if (history.size() < 100){
                 break;
             }
-            messageHistory = textChannel.getHistoryAfter(messages.get(messages.size() - 1), 100).complete();
+            messageHistory = textChannel.getHistoryAfter(messages.getLast(), 100).complete();
         }
 
         // Put all the retrieved messages in the map
@@ -47,7 +45,7 @@ public class MessageCache {
         }
 
         // Register the listener
-        Main.jda.addEventListener(new MessageCacheListener());
+        textChannel.getJDA().addEventListener(new MessageCacheListener());
     }
 
     // Return a list of all messages in the cache

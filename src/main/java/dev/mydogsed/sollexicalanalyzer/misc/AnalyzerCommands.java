@@ -1,5 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.misc;
 
+import dev.mydogsed.sollexicalanalyzer.DiscordStatics;
 import dev.mydogsed.sollexicalanalyzer.Util;
 import dev.mydogsed.sollexicalanalyzer.Main;
 import dev.mydogsed.sollexicalanalyzer.framework.SlashCommand;
@@ -121,7 +122,7 @@ public class AnalyzerCommands implements SlashCommand {
         event.deferReply().queue();
         List<Message> messages = new ArrayList<>(Main.smashesCache.getMessages().stream().filter((Message message) -> !message.getContentRaw().contains("//")).toList());
         messages.sort(Comparator.comparing(message -> message.getContentRaw().length()));
-        Message longestMessage = messages.get(messages.size() - 1);
+        Message longestMessage = messages.getLast();
         EmbedBuilder eb = analyzerEmbed("Longest")
                 .setDescription("The longest single keyboard smash is " + Util.getMessageContentRaw(longestMessage).length() + " characters")
                 .addField(Util.getMessageContentRaw(longestMessage), longestMessage.getJumpUrl(), false);
@@ -241,7 +242,7 @@ public class AnalyzerCommands implements SlashCommand {
     private static EmbedBuilder analyzerEmbed(String title) {
         return new EmbedBuilder()
                 .setTitle(title)
-                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", Main.jda.getSelfUser().getAvatarUrl())
+                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", DiscordStatics.getInstance().getAvatarUrl())
                 .setColor(new Color(184, 56, 59))
                 .setTimestamp(new Date().toInstant());
     }

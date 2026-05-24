@@ -23,7 +23,7 @@ public class AdminCommands implements SlashCommand {
                 .addSubcommands(
                         new SubcommandData("sync", "sync #quotes-without-context to the db"),
                         new SubcommandData("shutdown", "shut down the bot"),
-                        new SubcommandData("registerSlashCommands", "register slash commands for all guilds")
+                        new SubcommandData("registercommands", "register slash commands for all guilds")
                 );
     }
 
@@ -32,7 +32,7 @@ public class AdminCommands implements SlashCommand {
         switch (event.getSubcommandName()) {
             case "sync" -> syncCommand(event);
             case "shutdown" -> shutdownCommand(event);
-            case "registerSlashCommands" -> registerSlashCommands(event);
+            case "registercommands" -> registerSlashCommands(event);
         }
     }
 

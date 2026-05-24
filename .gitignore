@@ -42,7 +42,6 @@ bin/
 .DS_Store
 
 ### Project-specific ###
-# exclude the .apikey file
-.apikey
-# exclude the run directory
-/execution/
+# exclude .env and db
+.env
+*.db

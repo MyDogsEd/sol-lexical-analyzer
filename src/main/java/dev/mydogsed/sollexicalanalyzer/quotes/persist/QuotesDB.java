@@ -1,5 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes.persist;
 
+import dev.mydogsed.sollexicalanalyzer.DiscordStatics;
 import dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.Quote;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.QuoteAuthor;
@@ -18,12 +19,6 @@ import java.util.List;
 
 public class QuotesDB extends ListenerAdapter {
 
-    // ID For the quote channel
-    public static final Long QUOTE_CHANNEL = 1233098767658520668L;
-
-    // Fruity Factory server id
-    public static final Long FRUITY_FACTORY = 1233092684198182943L;
-
     // Logging
     private static final Logger log = LoggerFactory.getLogger(QuotesDB.class);
 
@@ -31,7 +26,7 @@ public class QuotesDB extends ListenerAdapter {
     public static void doMessageSync(JDA jda) {
 
         // Get the quotes TextChannel
-        TextChannel quotesChannel = jda.getTextChannelById(QUOTE_CHANNEL);
+        TextChannel quotesChannel = DiscordStatics.getInstance().getQuotesChannel();
 
         // If the channel is not found, error and return
         if (quotesChannel == null) {log.error("Quotes channel not found!"); return;}

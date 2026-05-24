@@ -1,5 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes.persist;
 
+import dev.mydogsed.sollexicalanalyzer.DiscordStatics;
 import dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
@@ -16,7 +17,7 @@ public class QuotesDBListener extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent event) {
 
         // Check that message is in the quotes channel
-        if (event.getChannel().getIdLong() != QuotesDB.QUOTE_CHANNEL) {
+        if (event.getChannel().getIdLong() != DiscordStatics.getInstance().getQuotesChannel().getIdLong()) {
             log.debug("Message received not in quotes channel");
             return;
         }
@@ -33,7 +34,7 @@ public class QuotesDBListener extends ListenerAdapter {
 
     //
     public void onMessageUpdate(MessageUpdateEvent event) {
-        if (event.getChannel().getIdLong() != QuotesDB.QUOTE_CHANNEL) return;
+        if (event.getChannel().getIdLong() != DiscordStatics.getInstance().getQuotesChannel().getIdLong()) return;
 
         if (!QuotesDB.quoteExists(event.getMessageIdLong())) return;
 
@@ -42,7 +43,7 @@ public class QuotesDBListener extends ListenerAdapter {
     }
 
     public void onMessageDelete(MessageDeleteEvent event) {
-        if (event.getChannel().getIdLong() != QuotesDB.QUOTE_CHANNEL) return;
+        if (event.getChannel().getIdLong() != DiscordStatics.getInstance().getQuotesChannel().getIdLong()) return;
         if (!QuotesDB.quoteExists(event.getMessageIdLong())) return;
 
         QuotesDB.removeQuote(event.getMessageIdLong());

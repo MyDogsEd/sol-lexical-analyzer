@@ -1,5 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes;
 
+import dev.mydogsed.sollexicalanalyzer.DiscordStatics;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReference;
@@ -7,15 +8,13 @@ import net.dv8tion.jda.api.entities.MessageReference;
 import java.awt.*;
 import java.time.Instant;
 
-import static dev.mydogsed.sollexicalanalyzer.Main.jda;
-
 public class QuotesUtil {
 
     // Base EmbedBuilder for quotes commands
     public static EmbedBuilder quotesEmbed(String title) {
         return new EmbedBuilder()
                 .setTitle(title)
-                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", jda.getSelfUser().getAvatarUrl())
+                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", DiscordStatics.getInstance().getAvatarUrl())
                 .setColor(new Color(88, 133, 162))
                 .setTimestamp(Instant.now());
     }
