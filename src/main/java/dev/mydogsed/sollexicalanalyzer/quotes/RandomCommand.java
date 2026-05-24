@@ -14,16 +14,17 @@ import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.Color;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static dev.mydogsed.sollexicalanalyzer.Main.jda;
-import static dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil.randomQuoteEmbed;
 
 public class RandomCommand implements SlashCommand {
 
@@ -53,18 +54,15 @@ public class RandomCommand implements SlashCommand {
         event.deferReply().queue();
 
         List<Quote> quotes;
-
-        // Fetch quotes from a specific user
+        // If the user option is present, fetch quotes from that user
         if (event.getOption("from") != null) {
             User user = event.getOption("from").getAsUser();
             quotes = QuotesDB.getQuoteAuthor(user.getIdLong()).getQuotes();
-        }
-
-        // Fetch all quotes
-        else {
+        } else { // Otherwise, fetch all quotes
             quotes = QuotesDB.getQuotes();
         }
 
+        // If the excluding option is present, exclude quotes from that user
         if (event.getOption("excluding") != null) {
             User user = event.getOption("excluding").getAsUser();
             quotes = quotes.stream().filter(q -> !  q.getAuthor().getId().equals(user.getIdLong())).collect(Collectors.toList());
@@ -78,6 +76,7 @@ public class RandomCommand implements SlashCommand {
 
         Quote randomQuote = quotes.get(new Random().nextInt(quotes.size()));
 
+        // 1% chance that qiqi is rolled
         if (new Random().nextInt(100) == 69) {
             hook.editOriginalAttachments(
                     FileUpload.fromData(
@@ -90,29 +89,29 @@ public class RandomCommand implements SlashCommand {
 
         EmbedBuilder eb = randomQuoteEmbed(randomQuote);
         hook.editOriginalEmbeds(eb.build()).setActionRow(
-                Button.of(ButtonStyle.PRIMARY, "upvote", up),
-                Button.of(ButtonStyle.DANGER, "downvote", down)
-        ).queue(m -> handleButtonInteraction(m, event, randomQuote));
-
+                    Button.of(ButtonStyle.PRIMARY, "upvote", up),
+                    Button.of(ButtonStyle.DANGER, "downvote", down)
+                ).queue(m -> addButtonsCallback(m, event, randomQuote));
     }
 
-    private void handleButtonInteraction(Message message, SlashCommandInteractionEvent event, Quote quote) {
-        ListenerAdapter buttonListener = getListenerAdapter(message, quote);
+    private void addButtonsCallback(Message message, SlashCommandInteractionEvent event, Quote quote) {
 
-        Runnable shutdownRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Disable the actionRows
-                var ar = message.getActionRows().get(0);
-                event.getHook().editOriginalComponents(ar.asDisabled()).queue();
-            }
+        // Create a runnable to disable the ActionRows
+        // This runnable should be called when shutting down the bot
+        Runnable disableRow = () -> {
+            // Disable the actionRows
+            message.getActionRows().forEach((ActionRow row) ->
+                    event.getHook().editOriginalComponents(row.asDisabled()).queue()
+            );
+
         };
+        AdminCommands.shutdownRunnables.add(disableRow);
 
         // Add the button listener to JDA
+        ListenerAdapter buttonListener = getListenerAdapter(message, quote);
         event.getJDA().addEventListener(buttonListener);
 
-        // Add the shutdownRunnable to the shutdownrunnables set
-        AdminCommands.shutdownRunnables.add(shutdownRunnable);
+        // Add the shutdown runnable to the polls queue so it can be called
 
         new Timer().schedule(new TimerTask() {
             public void run() {
@@ -122,7 +121,7 @@ public class RandomCommand implements SlashCommand {
 
                 // Unregister the event listener
                 event.getJDA().removeEventListener(buttonListener);
-                AdminCommands.shutdownRunnables.remove(shutdownRunnable);
+                AdminCommands.shutdownRunnables.remove(disableRow);
             }
         }, 600_000); // 600,000 ms is 10 minutes
     }
@@ -131,7 +130,10 @@ public class RandomCommand implements SlashCommand {
     private static ListenerAdapter getListenerAdapter(Message message, Quote quote) {
         long messageId = message.getIdLong();
 
-        ListenerAdapter buttonListener = new ListenerAdapter() {
+        // Acknowledge the event
+        // Get the component ID of the clicked button
+        // Edit the embed to update the score of the quote
+        return new ListenerAdapter() {
 
             final Set<User> interactedUsers = new HashSet<>();
 
@@ -168,6 +170,27 @@ public class RandomCommand implements SlashCommand {
                 hook.editOriginalEmbeds(randomQuoteEmbed(quote).build()).queue();
             }
         };
-        return buttonListener;
+    }
+
+    // Template EmbedBuilder for random quote command
+    private static EmbedBuilder randomQuoteEmbed(Quote quote) {
+        EmbedBuilder eb = new EmbedBuilder()
+                .setTitle("Random Quote")
+                .setAuthor("sol-lexical-analyzer", "https://mydogsed.dev", jda.getSelfUser().getAvatarUrl())
+                .setColor(new Color(88, 133, 162))
+                .setFooter(quote.getAuthor().getUserName(), quote.getAuthor().getAvatarURL())
+                .setTimestamp(quote.getTimeCreated());
+
+        // is this a text quote?
+        if (quote.isTextQuote()) {
+            eb.addField(quote.getContent(), quote.getJumpURL() + "\nScore: " + quote.getScore(), false);
+        }
+
+        else {
+            eb.setImage(quote.getImageURL());
+            eb.setDescription(quote.getJumpURL() + "\nScore: " + quote.getScore());
+        }
+
+        return eb;
     }
 }
