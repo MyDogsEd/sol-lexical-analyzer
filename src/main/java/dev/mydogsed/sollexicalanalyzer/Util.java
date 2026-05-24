@@ -4,11 +4,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReference;
 import net.dv8tion.jda.api.utils.MarkdownSanitizer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Random;
-import java.util.Scanner;
 
 public class Util {
 
@@ -100,13 +97,4 @@ public class Util {
                 m.getMessageReference().getType() == MessageReference.MessageReferenceType.FORWARD &&
                 m.getMessageSnapshots().get(0).getAttachments().size() == 1;
     }
-
-    // Utility method to get the API key from the file present in the same directory
-    public static String getApiKey() throws FileNotFoundException {
-        File file = new File("./BOT_KEY.apikey");
-        Scanner scanner = new Scanner(file);
-        return scanner.next();
-    }
-
-
 }

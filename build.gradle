@@ -33,6 +33,9 @@ dependencies {
     // Mockito for mocking JDA
     testImplementation("org.mockito:mockito-core:4.11.0")
     testImplementation("org.mockito:mockito-junit-jupiter:4.11.0")
+
+    // dotenv for .env
+    implementation("io.github.cdimascio:dotenv-java:3.2.0")
 }
 
 test {

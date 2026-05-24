@@ -28,11 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileNotFoundException;
-import java.nio.file.Paths;
 import java.util.*;
-
-import static dev.mydogsed.sollexicalanalyzer.Util.getApiKey;
 
 public class Main extends ListenerAdapter {
 
@@ -44,14 +40,12 @@ public class Main extends ListenerAdapter {
 
     public static MessageCache smashesCache;
 
-    public static MessageCache quotesCache;
-
     private static final long startTime = System.currentTimeMillis();
 
     public static void main(String[] args) {
         // Log the bot in
         try {
-            jda = JDABuilder.createDefault(getApiKey())
+            jda = JDABuilder.createDefault(Config.DISCORD_TOKEN)
                     .addEventListeners(new Main())
                     .enableIntents(EnumSet.allOf(GatewayIntent.class))
                     .enableCache(CacheFlag.EMOJI)
@@ -59,15 +53,10 @@ public class Main extends ListenerAdapter {
                     .setStatus(OnlineStatus.DO_NOT_DISTURB)
                     .build();
         }
-        // File not found
-        catch (FileNotFoundException e) {
-            logger.error("API Key file not found.");
-            logger.error("You must create the BOT_KEY.apikey file in the same directory as the .jar file.");
-            logger.error("(Checking in {} for key file)", Paths.get("").toAbsolutePath());
-        }
         // Token is not valid
         catch (InvalidTokenException e) {
-            logger.error("The provided token is invalid.");
+            logger.error("The provided token is invalid. " +
+                    "(Is DISCORD_TOKEN provided in the environment variables?)");
         }
         // Everything Else
         catch (IllegalArgumentException e){
