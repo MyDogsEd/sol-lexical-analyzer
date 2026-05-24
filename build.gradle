@@ -1,10 +1,10 @@
 plugins {
-    id "com.gradleup.shadow" version "8.3.1"
     id 'java'
+    id 'application'
 }
 
 group = 'dev.mydogsed'
-version = '1.0.0'
+version = '1.1.0-env'
 
 java {
     toolchain {
@@ -48,29 +48,6 @@ test {
     useJUnitPlatform()
 }
 
-jar {
-    manifest {
-        attributes "Main-Class": "dev.mydogsed.sollexicalanalyzer.Main"
-    }
-}
-
-// Set the file name
-// Copy the file to the execution directory
-shadowJar {
-    archiveFileName.set('sol-lexical-analyzer.jar')
-    finalizedBy("copyJar")
-}
-
-// Copy the .JAR file from the libs directory to the execution directory (Creating it if not present)
-tasks.register('copyJar', Copy) {
-    from "build/libs/sol-lexical-analyzer.jar"
-    into "execution"
-}
-
-// Task that builds and then runs the bot jar file
-tasks.register("buildAndRunJar", JavaExec){
-    dependsOn 'shadowJar'
-    dependsOn 'copyJar'
-    workingDir = file("execution")
-    classpath = files("execution/sol-lexical-analyzer.jar")
+application {
+    mainClass = 'dev.mydogsed.sollexicalanalyzer.Main'
 }
