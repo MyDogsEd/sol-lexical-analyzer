@@ -1,6 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes.persist;
 
-import dev.mydogsed.sollexicalanalyzer.Util;
+import dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -25,7 +25,7 @@ public class QuotesDBListener extends ListenerAdapter {
         Message message = event.getMessage();
 
         // Check if it is a quote
-        if (!Util.isQuote(message)) {return;}
+        if (!QuotesUtil.isQuote(message)) {return;}
 
         // Add it to the database
         QuotesDB.addOrUpdateQuote(message);

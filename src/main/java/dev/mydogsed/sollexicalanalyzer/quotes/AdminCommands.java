@@ -3,7 +3,6 @@ package dev.mydogsed.sollexicalanalyzer.quotes;
 import dev.mydogsed.sollexicalanalyzer.framework.SlashCommand;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.QuotesDB;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -11,6 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import static dev.mydogsed.sollexicalanalyzer.Main.registerSlashCommandsToDiscord;
 
 public class AdminCommands implements SlashCommand {
 
@@ -21,7 +22,8 @@ public class AdminCommands implements SlashCommand {
         return Commands.slash("admin", "misc admin commands")
                 .addSubcommands(
                         new SubcommandData("sync", "sync #quotes-without-context to the db"),
-                        new SubcommandData("shutdown", "shut down the bot")
+                        new SubcommandData("shutdown", "shut down the bot"),
+                        new SubcommandData("registerSlashCommands", "register slash commands for all guilds")
                 );
     }
 
@@ -30,7 +32,12 @@ public class AdminCommands implements SlashCommand {
         switch (event.getSubcommandName()) {
             case "sync" -> syncCommand(event);
             case "shutdown" -> shutdownCommand(event);
+            case "registerSlashCommands" -> registerSlashCommands(event);
         }
+    }
+
+    private void registerSlashCommands(SlashCommandInteractionEvent event) {
+        registerSlashCommandsToDiscord();
     }
 
     private void shutdownCommand(SlashCommandInteractionEvent event) {

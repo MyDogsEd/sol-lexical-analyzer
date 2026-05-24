@@ -1,6 +1,6 @@
 package dev.mydogsed.sollexicalanalyzer.quotes.persist;
 
-import dev.mydogsed.sollexicalanalyzer.Util;
+import dev.mydogsed.sollexicalanalyzer.quotes.QuotesUtil;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.Quote;
 import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.QuoteAuthor;
 import net.dv8tion.jda.api.JDA;
@@ -51,7 +51,7 @@ public class QuotesDB extends ListenerAdapter {
 
     // Add or update a quote from a message
     public static void addOrUpdateQuote(Message message){
-        if (!Util.isQuote(message)) {return;}
+        if (!QuotesUtil.isQuote(message)) {return;}
 
         try (Session session = SessionFactoryManager.getSessionFactory().openSession()){
             Transaction tx = session.beginTransaction();
@@ -198,7 +198,7 @@ public class QuotesDB extends ListenerAdapter {
 
             // For each message, if it's a quote, add it to the quotes list
             for (Message message : history) {
-                if (Util.isQuote(message)) {
+                if (QuotesUtil.isQuote(message)) {
                     quotes.add(message);
                     log.debug("Pulling #{}", count);
                     count++;
