@@ -19,7 +19,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.3.0")
 
     // Logback for logging
-    implementation("ch.qos.logback:logback-classic:1.5.20")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
 
     // Hibernate for database
     implementation platform("org.hibernate.orm:hibernate-platform:6.6.11.Final")
