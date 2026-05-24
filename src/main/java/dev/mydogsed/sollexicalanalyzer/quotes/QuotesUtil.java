@@ -1,6 +1,5 @@
 package dev.mydogsed.sollexicalanalyzer.quotes;
 
-import dev.mydogsed.sollexicalanalyzer.quotes.persist.models.Quote;
 import net.dv8tion.jda.api.EmbedBuilder;
 
 import java.awt.*;
