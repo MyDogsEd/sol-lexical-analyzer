@@ -18,13 +18,11 @@ import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.exceptions.InvalidTokenException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,56 +38,56 @@ public class Main extends ListenerAdapter {
 
     static void main() {
         // Log the bot in
+        JDA jda;
         try {
-            JDABuilder.createDefault(Config.DISCORD_TOKEN)
+            jda = JDABuilder.createDefault(Config.DISCORD_TOKEN)
                     .addEventListeners(new Main())
                     .enableIntents(EnumSet.allOf(GatewayIntent.class))
                     .enableCache(CacheFlag.EMOJI)
                     .setActivity(Activity.customStatus("starting..."))
                     .setStatus(OnlineStatus.DO_NOT_DISTURB)
-                    .build();
+                    .build()
+                    .awaitReady();
         }
         // Token is not valid
         catch (InvalidTokenException e) {
             logger.error("The provided token is invalid. " +
                     "(Is DISCORD_TOKEN provided in the environment variables?)");
+            return;
         }
         // Everything Else
         catch (IllegalArgumentException e){
             logger.error("One of the provided arguments is invalid.");
+            return;
+        } catch (InterruptedException e) {
+            logger.error("JDA Was interrupted while awaiting ready.");
+            return;
         }
-        // The bot has already started at this point, so all code is handled by events
-    }
-
-    // Register all commands and things after the bot is logged in and ready for us to do so
-    @Override
-    public void onReady(@NotNull ReadyEvent event) {
         logger.info("Starting sol-lexical-analyzer on JDA version {}", JDAInfo.VERSION);
 
         // TODO: move this to a command or something, this really should only be done once, not every time the bot logs in
         // MessageCache has to come first, before we attach command executors
 
-        DiscordStatics.init(event.getJDA());
+        DiscordStatics.init(jda);
 
         createSmashesCache();
         registerCommandExecutors(CommandRegistry.getInstance());
         registerSlashCommandsToDiscord();
-        registerListeners(event.getJDA());
+        registerListeners(jda);
 
         // Set timer for pulling a random line as a status
         new Timer().schedule((new TimerTask(){
             public void run() {
                 String smash = Util.randomSmash().getContentRaw();
-                if (smash.length() > 126) {
-                    smash = smash.substring(0, 126);
-                }
-                event.getJDA().getPresence().setPresence(
+                if (smash.length() > 126) smash = smash.substring(0, 126);
+                jda.getPresence().setPresence(
                         OnlineStatus.ONLINE,
                         Activity.customStatus(String.format("\"%s\"", smash)),
                         false
                 );
 
-            }}),0,1_800_000); // 1.8 million ms is 30 min
+            }
+        }),0,1_800_000);// 1.8 million ms is 30 min
 
         logger.info("sol-lexical-analyzer is ready!");
         logger.info ("Startup took {} s", (System.currentTimeMillis() - startTime) / 1000);
